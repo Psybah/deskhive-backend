@@ -4,6 +4,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
+import { VerifyUserDto } from './dto/user.dto';
 
 const roundsOfHashing = parseInt(process.env.SALT_ROUNDS);
 
@@ -69,6 +70,31 @@ export class UserService {
 	}
 	async findAll() {
 		return await this.prisma.user.findMany({});
+	}
+
+	async verifyUser(data: VerifyUserDto) {
+		try {
+			const user = await this.prisma.user.update({
+				where: {
+					email: data.email,
+				},
+				data: {
+					isVerified: data.isVerified,
+				}
+			});
+			return {
+				data: user,
+				message: 'User verified successfully',
+			}
+		} catch (error) {
+			if (error.code === 'P2002') {
+				throw new ConflictException('Email already exists');
+			}
+			if (error.code === 'P2025') {
+				throw new ConflictException('Email does not exist');
+			}
+			throw new InternalServerErrorException('Internal server error');
+		}
 	}
 
 	// boilerplate code from nestjs

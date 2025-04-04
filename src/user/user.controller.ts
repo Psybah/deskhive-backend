@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@n
 import { UserService } from './user.service';
 import { CreateEmployeeDto, CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { VerifyUserDto } from './dto/user.dto';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { AuthorizationGuard } from 'src/auth/guards/authorization.guard';
@@ -16,6 +17,12 @@ export class UserController {
 	@ApiOperation({ summary: 'Create a new user' })
 	create(@Body() createUserDto: CreateUserDto) {
 		return this.userService.createUser(createUserDto);
+	}
+
+	@Post('/verify-user')
+	@ApiOperation({ summary: 'Verify user account' })
+	verifyUser(@Body() data: VerifyUserDto) {
+		return this.userService.verifyUser(data);
 	}
 
 	@Post('/signup/employee')
